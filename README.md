@@ -18,6 +18,10 @@ Jako materiał wprowadzający do problemu można wykorzystać krótki film eduka
 
 [Wildfires 101 | National Geographic](https://www.youtube.com/watch?v=5hghT1W33cY)
 
+oraz film Veritasium poświęcony tematyce power law:
+
+[Power Law]((https://youtu.be/HBluLfX2F_k))
+
 ## 4. Jak chcemy przeprowadzić symulację
 Planujemy zamodelować las jako dwuwymiarową siatkę o rozmiarze \(n \times m\). Każda komórka mapy będzie reprezentowała fragment terenu, który może należeć do jednej z kilku kategorii, na przykład:
 - drzewo,
