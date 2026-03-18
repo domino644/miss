@@ -20,7 +20,7 @@ Jako materiał wprowadzający do problemu można wykorzystać krótki film eduka
 
 oraz film Veritasium poświęcony tematyce power law:
 
-[Power Law]((https://youtu.be/HBluLfX2F_k))
+[Power Law](https://youtu.be/HBluLfX2F_k)
 
 ## 4. Jak chcemy przeprowadzić symulację
 Planujemy zamodelować las jako dwuwymiarową siatkę o rozmiarze \(n \times m\). Każda komórka mapy będzie reprezentowała fragment terenu, który może należeć do jednej z kilku kategorii, na przykład:
