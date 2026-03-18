@@ -40,6 +40,8 @@ W kolejnych wersjach modelu chcemy rozszerzyć symulację o bardziej realistyczn
 
 Aby zwalidować wyniki, planujemy porównać dane uzyskane w symulacji ze zbiorem danych dotyczącym rzeczywistych pożarów lasów w Ameryce Północnej. Pozwoli to ocenić, czy model odtwarza najważniejsze cechy badanego zjawiska i czy obserwowany rozkład wielkości pożarów rzeczywiście przypomina rozkład potęgowy.
 
+[National Fire Database fire polygon data](https://cwfis.cfs.nrcan.gc.ca/datamart/download/nfdbpoly)
+
 ## 5. Co chcemy osiągnąć
 Naszym głównym celem jest sprawdzenie, czy nawet stosunkowo prosty model komórkowy potrafi odtworzyć podstawowe własności rzeczywistych pożarów lasów. W szczególności chcemy:
 - zbadać, czy rozmiary pożarów w symulacji wykazują cechy rozkładu *power law*,
