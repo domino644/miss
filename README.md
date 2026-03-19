@@ -9,6 +9,8 @@ Pożary lasów stanowią jedno z najpoważniejszych zagrożeń środowiskowych w
 
 Celem naszego projektu jest stworzenie uproszczonego modelu symulacyjnego pożarów lasów oraz zbadanie, czy rozkład wielkości pożarów może być opisywany przez rozkład potęgowy (*power law*). Interesuje nas również wskazanie czynników, które w największym stopniu wpływają na prawdopodobieństwo wystąpienia dużych pożarów, a także zaproponowanie działań, które mogłyby ograniczać ryzyko ich powstawania.
 
+Więcej o tym można znaleźć w paperze - [Critical Behaviour of the Drossel-Schwabl Forest Fire Model](https://arxiv.org/abs/cond-mat/0202022).
+
 ## 3. Opis problemu
 Pożary lasów są zjawiskiem złożonym, wynikającym z oddziaływania wielu czynników losowych i środowiskowych. Ogień może zostać zapoczątkowany przez naturalne źródła, takie jak pioruny, ale również przez działalność człowieka. Po rozpoczęciu pożaru jego dalszy rozwój zależy między innymi od gęstości roślinności, warunków pogodowych, ukształtowania terenu oraz obecności naturalnych barier, takich jak rzeki czy obszary pozbawione drzew.
 
@@ -41,6 +43,8 @@ W kolejnych wersjach modelu chcemy rozszerzyć symulację o bardziej realistyczn
 Aby zwalidować wyniki, planujemy porównać dane uzyskane w symulacji ze zbiorem danych dotyczącym rzeczywistych pożarów lasów w Ameryce Północnej. Pozwoli to ocenić, czy model odtwarza najważniejsze cechy badanego zjawiska i czy obserwowany rozkład wielkości pożarów rzeczywiście przypomina rozkład potęgowy.
 
 [National Fire Database fire polygon data](https://cwfis.cfs.nrcan.gc.ca/datamart/download/nfdbpoly)
+
+Do przeprowadzenia symulacji możemy użyć gotowego [modelu Fire w programie NetLogo](https://ccl.northwestern.edu/netlogo/models/Fire).
 
 ## 5. Co chcemy osiągnąć
 Naszym głównym celem jest sprawdzenie, czy nawet stosunkowo prosty model komórkowy potrafi odtworzyć podstawowe własności rzeczywistych pożarów lasów. W szczególności chcemy:
