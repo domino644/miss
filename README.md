@@ -61,7 +61,7 @@ Chcemy rozszerzyć bazowy model o heterogeniczne środowisko, w którym prawdopo
 
 $p_{burn} = p_0 (1 + p_{veg}) (1 + p_{den}) p_w p_s$
 
-gdzie $p_0$ to bazowe prawdopodobieństwo zapłonu, $p_veg$ opisuje wpływ typu roślinności, $p_den$ wpływ gęstości roślinności, $p_w$ wpływ wiatru, a $p_s$ wpływ nachylenia terenu.
+gdzie $p_0$ to bazowe prawdopodobieństwo zapłonu, $p_{veg}$ opisuje wpływ typu roślinności, $p_{den}$ wpływ gęstości roślinności, $p_w$ wpływ wiatru, a $p_s$ wpływ nachylenia terenu.
 
 W naszym modelu chcemy uwzględnić typ roślinności, gęstość roślinności, wiatr oraz obecność dróg i cieków wodnych, które mogą działać jako bariery ograniczające rozprzestrzenianie się ognia. Dodatkowo w przyszłości można rozważyć przejście ze stanów dyskretnych na stany ciągłe, gdzie stan komórki opisywałby np. stopień spalenia paliwa lub intensywność pożaru.
 
