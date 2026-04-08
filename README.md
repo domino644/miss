@@ -55,7 +55,7 @@ Naszym głównym celem jest sprawdzenie, czy nawet stosunkowo prosty model komó
 
 Ostatecznie projekt ma pokazać, że modelowanie i symulacja mogą być użytecznym narzędziem do analizy złożonych zjawisk przyrodniczych oraz do wspierania decyzji związanych z ochroną środowiska i zarządzaniem kryzysowym.
 
-## 6. Porównanie z bazowym modelem pożaru lasu
+## 6. Rozszerzenie bazowego modelu
 
 Chcemy rozszerzyć bazowy model o heterogeniczne środowisko, w którym prawdopodobieństwo zapłonu zależy od lokalnych cech komórki, przede wszystkim od typu roślinności i gęstości roślinności. Oprzemy to na podejściu z modelu Alexandridisa, w którym:
 
