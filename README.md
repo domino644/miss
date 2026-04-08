@@ -54,3 +54,19 @@ Naszym głównym celem jest sprawdzenie, czy nawet stosunkowo prosty model komó
 - zaproponować możliwe strategie ograniczania ryzyka występowania dużych pożarów, na przykład poprzez zmianę gęstości zalesienia, tworzenie barier terenowych lub inne działania prewencyjne.
 
 Ostatecznie projekt ma pokazać, że modelowanie i symulacja mogą być użytecznym narzędziem do analizy złożonych zjawisk przyrodniczych oraz do wspierania decyzji związanych z ochroną środowiska i zarządzaniem kryzysowym.
+
+## 6. Porównanie z bazowym modelem pożaru lasu
+
+Bazowy model pożaru lasu to prosty automat komórkowy, w którym każda komórka może znajdować się w jednej z kilku dyskretnych stanów, na przykład: pusta, drzewo albo płonąca. Ogień rozprzestrzenia się wyłącznie na najbliższe sąsiednie komórki zgodnie ze stałą lokalną regułą. Taki model zazwyczaj nie uwzględnia ukształtowania terenu, warunków pogodowych ani rzeczywistych danych środowiskowych. Jego głównym celem jest badanie ogólnych mechanizmów rozprzestrzeniania się pożaru, a nie odtwarzanie realnych zdarzeń pożarowych.
+
+W przeciwieństwie do tego, zastosowany tutaj model rozwija podejście bazowe na kilka istotnych sposobów.
+
+Po pierwsze, prawdopodobieństwo zapłonu nie jest już stałe. Zależy ono od takich czynników jak typ roślinności, gęstość roślinności, wiatr oraz topografia terenu. Dzięki temu symulacja staje się przestrzennie niejednorodna i znacznie lepiej oddaje rzeczywiste zachowanie ognia.
+
+Po drugie, model wykorzystuje rzeczywiste dane geoprzestrzenne i meteorologiczne, między innymi dane o pokryciu terenu, nachyleniu wyznaczonym na podstawie wysokości terenu, prędkości i kierunku wiatru, drogach, ciekach wodnych oraz obszarach spalonych we wcześniejszych pożarach. W efekcie symulacja nie jest już wyłącznie abstrakcyjnym procesem na siatce, ale rekonstrukcją rozprzestrzeniania się pożaru opartą na danych dla konkretnego obszaru.
+
+Po trzecie, model wprowadza rozszerzoną, nielokalną regułę propagacji oznaczoną jako N2, która pozwala ogniowi przemieszczać się dalej w kierunku wiatru niż w standardowym układzie najbliższych sąsiadów. Przy silnym wietrze zapłon może nastąpić kilka komórek dalej, co lepiej odwzorowuje szybkie rozprzestrzenianie się pożaru napędzanego wiatrem i częściowo oddaje efekty zbliżone do spottingu. Jest to jedna z kluczowych różnic względem modelu bazowego, w którym propagacja jest wyłącznie lokalna.
+
+Wreszcie, zamiast generować tylko jeden abstrakcyjny przebieg symulacji, model uruchamiany jest w postaci zespołu wielu symulacji, aby oszacować prawdopodobieństwo spalenia danego obszaru oraz wzorce czasu dotarcia pożaru. Dzięki temu lepiej nadaje się do analizy rzeczywistych scenariuszy pożarowych niż klasyczny bazowy automat pożaru lasu.
+
+Krótko mówiąc, w porównaniu z bazowym modelem pożaru lasu ta wersja dodaje niejednorodne reguły zapłonu, wpływ wiatru i terenu, rzeczywiste dane GIS i meteorologiczne, bariery takie jak drogi i cieki wodne, nielokalne rozprzestrzenianie zależne od wiatru oraz probabilistyczną symulację opartą na wielu uruchomieniach.
