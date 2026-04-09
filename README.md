@@ -70,7 +70,9 @@ Korzyścią z zastosowania rozszerzonego modelu jest przede wszystkim większy r
 Rozszerzone modele są zwykle trafniejsze od prostego modelu bazowego, ponieważ pozwalają lepiej przewidywać kierunek i tempo propagacji ognia. Jednocześnie zachowują zaletę automatów komórkowych, czyli stosunkowo niską złożoność obliczeniową i możliwość szybkiej symulacji dużych obszarów.
 
 Źródła:
+
 https://www.mdpi.com/2571-6255/9/3/108
+
 https://nhess.copernicus.org/articles/19/169/2019/
 
 
