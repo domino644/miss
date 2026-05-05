@@ -1,1 +1,4 @@
 .venv
+src/generated/
+data/rhodes_fire_outputs
+.DS_Store
