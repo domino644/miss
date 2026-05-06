@@ -26,7 +26,7 @@ print(f"Grid shape: {GRID_WIDTH, GRID_HEIGHT}")
 TREE_DENSITY = 0.4
 GROWTH_PROB = 0.0   # probability that empty/burned cell becomes a tree
 LIGHTNING_PROB = 0.0   # probability of ignition attempt in a step
-SPREAD_PROB = 1.0      # probability fire spreads to a neighboring tree
+SPREAD_PROB = 0.5      # probability fire spreads to a neighboring tree
 
 # =========================
 # Cell states

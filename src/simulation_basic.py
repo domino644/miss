@@ -26,7 +26,20 @@ FIRE_START = load_fire_start(
     GRID_HEIGHT,
 )
 
-SPREAD_PROB = 1.0
+SPREAD_PROB = 0.15
+WIND_BONUS = 0.75
+WIND_DIRECTION = "S"
+
+WIND_FORWARD_NEIGHBORS = {
+    "N":  [(-1, -1), (-1, 0), (-1, 1)],
+    "NE": [(-1, 0), (-1, 1), (0, 1)],
+    "E":  [(-1, 1), (0, 1), (1, 1)],
+    "SE": [(0, 1), (1, 1), (1, 0)],
+    "S":  [(1, -1), (1, 0), (1, 1)],
+    "SW": [(0, -1), (1, -1), (1, 0)],
+    "W":  [(-1, -1), (0, -1), (1, -1)],
+    "NW": [(-1, 0), (-1, -1), (0, -1)],
+}
 
 # =========================
 # Cell states
@@ -52,30 +65,47 @@ class ForestFireModel:
         grid: np.ndarray,
         fire_start: np.ndarray,
         spread_prob: float = 1.0,
+        wind_direction: str | None = None,
+        wind_bonus: float = 0.0,
     ):
         self.width = width
         self.height = height
         self.base_grid = grid.copy()
         self.fire_start = fire_start
         self.spread_prob = spread_prob
+        self.wind_direction = wind_direction
+        self.wind_bonus = wind_bonus
 
         self.grid = self.base_grid.copy()
         self.reset()
 
     def reset(self):
         self.grid = self.base_grid.copy()
+        # self.fire_start = np.zeros((self.height, self.width), dtype=np.uint8)
         ignition_mask = (self.fire_start == 1) & (self.grid == TREE)
         self.grid[ignition_mask] = BURNING
 
     def neighbors(self, y: int, x: int):
-        if y > 0:
-            yield (y - 1, x)
-        if y < self.height - 1:
-            yield (y + 1, x)
-        if x > 0:
-            yield (y, x - 1)
-        if x < self.width - 1:
-            yield (y, x + 1)
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if dy == 0 and dx == 0:
+                    continue
+
+                ny = y + dy
+                nx = x + dx
+
+                if 0 <= ny < self.height and 0 <= nx < self.width:
+                    yield ny, nx, dy, dx
+
+    def spread_probability_for_offset(self, dy: int, dx: int) -> float:
+        prob = self.spread_prob
+
+        if self.wind_direction is not None:
+            boosted = WIND_FORWARD_NEIGHBORS.get(self.wind_direction, [])
+            if (dy, dx) in boosted:
+                prob = min(1.0, prob + self.wind_bonus)
+
+        return prob
 
     def step(self) -> bool:
         if not np.any(self.grid == BURNING):
@@ -84,14 +114,16 @@ class ForestFireModel:
         new_grid = self.grid.copy()
 
         for y, x in np.argwhere(self.grid == BURNING):
-            for ny, nx in self.neighbors(y, x):
-                if self.grid[ny, nx] == TREE and random.random() < self.spread_prob:
-                    new_grid[ny, nx] = BURNING
+            for ny, nx, dy, dx in self.neighbors(y, x):
+                if self.grid[ny, nx] == TREE:
+                    spread_prob = self.spread_probability_for_offset(dy, dx)
+                    if random.random() < spread_prob:
+                        new_grid[ny, nx] = BURNING
 
             new_grid[y, x] = EMPTY
 
         self.grid = new_grid
-        return True
+        return np.any(self.grid == BURNING)
 
 
 class SimulationApp:
@@ -112,6 +144,8 @@ class SimulationApp:
             grid=GRID,
             fire_start=FIRE_START,
             spread_prob=SPREAD_PROB,
+            wind_direction=WIND_DIRECTION,
+            wind_bonus=WIND_BONUS,
         )
 
         self.running = True

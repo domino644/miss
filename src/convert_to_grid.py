@@ -27,9 +27,9 @@ def downsample_grid_by_2(grid: np.ndarray) -> np.ndarray:
             block = grid[2*y:2*y+2, 2*x:2*x+2].flatten()
 
             # Priorytet: jeśli gdziekolwiek jest TREE, wynik = TREE
-            # if np.any(block == TREE):
-            #     downsampled[y, x] = TREE
-            #     continue
+            if np.any(block == TREE):
+                downsampled[y, x] = TREE
+                continue
 
             values, counts = np.unique(block, return_counts=True)
             max_count = counts.max()
