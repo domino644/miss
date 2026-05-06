@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
+from PIL import Image
 
 CELL_SIZE_METERS = 375
 CSV_PATH = "dataset.csv"
@@ -87,6 +88,10 @@ def build_frp_grid(df: pd.DataFrame, rows: int, cols: int) -> np.ndarray:
 
     return grid
 
+def save_binary_grid_raw(grid: np.ndarray, output_path: str):
+    img_array = (np.flipud(grid) * 255).astype(np.uint8)
+    img = Image.fromarray(img_array, mode="L")
+    img.save(output_path)
 
 def save_binary_grid_plot(grid: np.ndarray, output_path: str, title: str):
     plt.figure(figsize=(10, 8))
@@ -98,7 +103,6 @@ def save_binary_grid_plot(grid: np.ndarray, output_path: str, title: str):
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close()
-
 
 def save_frp_grid_plot(grid: np.ndarray, output_path: str, title: str):
     plt.figure(figsize=(10, 8))
@@ -112,20 +116,25 @@ def save_frp_grid_plot(grid: np.ndarray, output_path: str, title: str):
     plt.close()
 
 
-def save_timestamp_grids(df: pd.DataFrame, rows: int, cols: int, output_dir: str):
-    timestamps = sorted(df["timestamp"].dropna().unique())
+# def save_timestamp_grids(df: pd.DataFrame, rows: int, cols: int, output_dir: str):
+#     timestamps = sorted(df["timestamp"].dropna().unique())
 
-    for i, ts in enumerate(timestamps, start=1):
-        df_ts = df[df["timestamp"] == ts]
-        if df_ts.empty:
-            continue
+#     for i, ts in enumerate(timestamps, start=1):
+#         df_ts = df[df["timestamp"] == ts]
+#         if df_ts.empty:
+#             continue
 
-        grid_ts = build_binary_grid(df_ts, rows, cols)
-        ts_str = pd.Timestamp(ts).strftime("%Y-%m-%d_%H-%M")
-        filename = os.path.join(output_dir, f"grid_{i:03d}_{ts_str}.png")
-        title = f"Fire detections at {ts}"
-        save_binary_grid_plot(grid_ts, filename, title)
+#         grid_ts = build_binary_grid(df_ts, rows, cols)
+#         ts_str = pd.Timestamp(ts).strftime("%Y-%m-%d_%H-%M")
+#         filename = os.path.join(output_dir, f"grid_{i:03d}_{ts_str}.png")
+#         title = f"Fire detections at {ts}"
+#         save_binary_grid_plot(grid_ts, filename, title)
 
+def get_earliest_fire_grid(df: pd.DataFrame, rows: int, cols: int) -> tuple[np.ndarray, pd.Timestamp]:
+    earliest_ts = df["timestamp"].dropna().min()
+    df_start = df[df["timestamp"] == earliest_ts]
+    fire_start_grid = build_binary_grid(df_start, rows, cols)
+    return fire_start_grid, earliest_ts
 
 def save_fire_animation(
     df: pd.DataFrame,
@@ -208,7 +217,7 @@ def main():
         "Rhodes fire as 375m x 375m FRP grid"
     )
 
-    save_timestamp_grids(df, rows, cols, OUTPUT_DIR)
+    # save_timestamp_grids(df, rows, cols, OUTPUT_DIR)
 
     save_fire_animation(
         df,
@@ -229,6 +238,12 @@ def main():
     )
 
     df.to_csv(os.path.join(OUTPUT_DIR, "fire_points_with_grid_coords.csv"), index=False)
+
+    fire_start_grid, _ = get_earliest_fire_grid(df, rows, cols)
+    save_binary_grid_raw(
+        fire_start_grid,
+        os.path.join(OUTPUT_DIR, "fire_start_grid.png")
+    )
 
     print("Done.")
     print(f"Files saved in: {OUTPUT_DIR}")

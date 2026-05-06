@@ -3,21 +3,29 @@ import random
 import numpy as np
 import pygame
 import csv
+from convert_to_grid import vegetation_map_to_grid, load_fire_start
+from PIL import Image
 
 # =========================
 # Configuration
 # =========================
-GRID_WIDTH = 240
-GRID_HEIGHT = 160
-CELL_SIZE = 5
+CELL_SIZE = 1
 SIDE_PANEL_WIDTH = 280
 FPS = 60
-STEP_DELAY_MS = 36
+STEP_DELAY_MS = 0
+
+GRID = vegetation_map_to_grid(r"C:\Users\Lukasz\Documents\GitHub\miss\data\rhodos\vegetation_before.png")
+GRID_WIDTH = GRID.shape[1]
+GRID_HEIGHT = GRID.shape[0]
+
+FIRE_START = load_fire_start(r"C:\Users\Lukasz\Documents\GitHub\miss\data\rhodes_fire_outputs\fire_start_grid.png", GRID_WIDTH, GRID_HEIGHT)
+
+print(f"Grid shape: {GRID_WIDTH, GRID_HEIGHT}")
 
 # Initial model parameters
 TREE_DENSITY = 0.4
-GROWTH_PROB = 0.0003     # probability that empty/burned cell becomes a tree
-LIGHTNING_PROB = 0.03   # probability of ignition attempt in a step
+GROWTH_PROB = 0.0   # probability that empty/burned cell becomes a tree
+LIGHTNING_PROB = 0.0   # probability of ignition attempt in a step
 SPREAD_PROB = 1.0      # probability fire spreads to a neighboring tree
 
 # =========================
@@ -26,11 +34,13 @@ SPREAD_PROB = 1.0      # probability fire spreads to a neighboring tree
 EMPTY = 0
 TREE = 1
 BURNING = 2
+WATER = 3
 
 COLORS = {
     EMPTY: (196, 164, 132),
     TREE: (34, 105, 34),
     BURNING: (230, 80, 30),
+    WATER: (15,94,156),
 }
 
 # =========================
@@ -41,6 +51,8 @@ class ForestFireModel:
         self,
         width,
         height,
+        grid = None,
+        fire_start = None,
         tree_density=0.65,
         growth_prob=0.003,
         lightning_prob=0.01,
@@ -54,7 +66,14 @@ class ForestFireModel:
         self.lightning_prob = lightning_prob
         self.spread_prob = spread_prob
 
-        self.grid = np.zeros((height, width), dtype=np.uint8)
+        self.grid_given = False
+        if grid is None:
+            self.grid = np.zeros((height, width), dtype=np.uint8)
+        else:
+            self.grid_given = True
+            self.grid = grid
+            self.fire_start = fire_start
+
         self.step_count = 0
 
         # Fire event tracking
@@ -68,9 +87,13 @@ class ForestFireModel:
         self.current_fire_size = 0
         self.fire_sizes = []
 
-        r = np.random.random((self.height, self.width))
-        self.grid[:, :] = EMPTY
-        self.grid[r < self.tree_density] = TREE
+        if not self.grid_given:
+            r = np.random.random((self.height, self.width))
+            self.grid[:, :] = EMPTY
+            self.grid[r < self.tree_density] = TREE
+        else:
+            ignition_mask = (self.fire_start == 1) & (self.grid == TREE)
+            self.grid[ignition_mask] = BURNING
 
     def neighbors(self, y, x):
         # von Neumann neighborhood: up, down, left, right
@@ -99,6 +122,15 @@ class ForestFireModel:
         self.grid[y, x] = BURNING
         self.current_fire_size = 1
         return True
+    
+    def ignite_cell(self, x, y):
+        if 0 <= x < self.width and 0 <= y < self.height:
+            if self.grid[y, x] == TREE:
+                self.grid[y, x] = BURNING
+                if self.current_fire_size == 0:
+                    self.current_fire_size = 1
+                return True
+        return False
 
     def step(self):
         self.step_count += 1
@@ -170,6 +202,7 @@ class SimulationApp:
         self.model = ForestFireModel(
             GRID_WIDTH,
             GRID_HEIGHT,
+            grid=GRID,
             tree_density=TREE_DENSITY,
             growth_prob=GROWTH_PROB,
             lightning_prob=LIGHTNING_PROB,
@@ -229,11 +262,10 @@ class SimulationApp:
             "UP/DOWN - spread +/-",
             "LEFT/RIGHT - lightning +/-",
             "W/S - growth +/-",
+            "P - save fire sizes to csv"
             "",
             "Mouse when paused:",
-            "LMB - tree",
-            "RMB - empty",
-            "P - save fire sizes to csv"
+            "LMB - ignite tree"
         ]
 
         y = 20
@@ -247,6 +279,9 @@ class SimulationApp:
         if not self.paused:
             return
 
+        if event.button != 1:
+            return
+
         mx, my = pygame.mouse.get_pos()
         if mx >= GRID_WIDTH * CELL_SIZE or my >= GRID_HEIGHT * CELL_SIZE:
             return
@@ -254,10 +289,7 @@ class SimulationApp:
         x = mx // CELL_SIZE
         y = my // CELL_SIZE
 
-        if event.button == 1:
-            self.model.set_cell(x, y, TREE)
-        elif event.button == 2:
-            self.model.set_cell(x, y, EMPTY)
+        self.model.ignite_cell(x, y)
 
     def handle_events(self):
         for event in pygame.event.get():
