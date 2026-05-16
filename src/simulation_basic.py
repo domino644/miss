@@ -5,29 +5,29 @@ import pygame
 
 from convert_to_grid import vegetation_map_to_grid, load_fire_start
 
-OUTPUT_IMAGE_PATH = r"simulation_result.png"
+OUTPUT_IMAGE_PATH = r"yacutz_simulation_result.png"
 
 # =========================
 # Configuration
 # =========================
-CELL_SIZE = 2
+CELL_SIZE = 1
 FPS = 60
-STEP_DELAY_MS = 0
+STEP_DELAY_MS = 4
 
 GRID = vegetation_map_to_grid(
-    r"C:\Users\Lukasz\Documents\GitHub\miss\data\rhodos\vegetation_before.png"
+    r"/Users/lukasz/Documents/Repositories/miss/data/yacutz/vegetation_before.png"
 )
 GRID_HEIGHT = GRID.shape[0]
 GRID_WIDTH = GRID.shape[1]
 
 FIRE_START = load_fire_start(
-    r"C:\Users\Lukasz\Documents\GitHub\miss\data\rhodes_fire_outputs\fire_start_grid.png",
+    r"/Users/lukasz/Documents/Repositories/miss/data/rhodes_fire_outputs/fire_start_grid.png",
     GRID_WIDTH,
     GRID_HEIGHT,
 )
 
-SPREAD_PROB = 0.15
-WIND_BONUS = 0.75
+SPREAD_PROB = 0.4
+WIND_BONUS = 0.0
 WIND_DIRECTION = "S"
 
 WIND_FORWARD_NEIGHBORS = {
@@ -81,7 +81,10 @@ class ForestFireModel:
 
     def reset(self):
         self.grid = self.base_grid.copy()
-        # self.fire_start = np.zeros((self.height, self.width), dtype=np.uint8)
+        self.fire_start = np.zeros((self.height, self.width), dtype=np.uint8)
+        self.fire_start[245:255, 645:655] = 1
+        self.fire_start[495:505, 845:855] = 1
+        self.fire_start[495:505, 295:305] = 1
         ignition_mask = (self.fire_start == 1) & (self.grid == TREE)
         self.grid[ignition_mask] = BURNING
 
