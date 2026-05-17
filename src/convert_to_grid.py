@@ -14,22 +14,22 @@ COLOR_TO_STATE = {
     (0, 0, 255): WATER,       # #0000ff
 }
 
-def downsample_grid_by_2(grid: np.ndarray) -> np.ndarray:
+def downsample_grid_by_n(grid: np.ndarray, n: int) -> np.ndarray:
     old_height, old_width = grid.shape
 
-    new_height = old_height // 2
-    new_width = old_width // 2
+    new_height = old_height // n
+    new_width = old_width // n
 
     downsampled = np.zeros((new_height, new_width), dtype=np.uint8)
 
     for y in range(new_height):
         for x in range(new_width):
-            block = grid[2*y:2*y+2, 2*x:2*x+2].flatten()
+            block = grid[n*y:n*y+n, n*x:n*x+n].flatten()
 
             # Priorytet: jeśli gdziekolwiek jest TREE, wynik = TREE
-            if np.any(block == TREE):
-                downsampled[y, x] = TREE
-                continue
+            # if np.any(block == TREE):
+            #     downsampled[y, x] = TREE
+            #     continue
 
             values, counts = np.unique(block, return_counts=True)
             max_count = counts.max()
@@ -51,7 +51,7 @@ def vegetation_map_to_grid(image_path: str) -> np.ndarray:
         mask = np.all(pixels == color, axis=2)
         grid[mask] = state
 
-    return downsample_grid_by_2(grid)
+    return downsample_grid_by_n(grid, 4)
     # return grid
 
 def load_fire_start(image_path: str, width: int, height: int) -> np.ndarray:
