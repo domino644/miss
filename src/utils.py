@@ -17,6 +17,16 @@ COLOR_TO_STATE = {
     (0, 0, 255): WATER,       # #0000ff
 }
 
+COLORS = {
+    EMPTY: (161, 117, 73),
+    TREE: (34, 105, 34),
+    IGNITING: (232, 144, 86),
+    BURNING: (255, 248, 141),
+    SMOLDERING: (112, 14, 14),
+    BURNED: (67,67,67),
+    WATER: (9,55,100),
+}
+
 def downsample_grid_by_n(grid: np.ndarray, n: int) -> np.ndarray:
     old_height, old_width = grid.shape
 
@@ -68,3 +78,13 @@ def load_fire_start(image_path: str, width: int, height: int) -> np.ndarray:
         Image.fromarray(fire_start).resize((width, height), resample=Image.NEAREST)
     )
     return fire_start_resized
+
+def save_grid_as_png(grid: np.ndarray, output_path: str):
+    height, width = grid.shape
+    img_array = np.zeros((height, width, 3), dtype=np.uint8)
+
+    for state, color in COLORS.items():
+        img_array[grid == state] = color
+
+    img = Image.fromarray(img_array, mode="RGB")
+    img.save(output_path)

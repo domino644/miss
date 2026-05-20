@@ -9,16 +9,6 @@ SMOLDERING = 4
 BURNED = 5
 WATER = 6
 
-COLORS = {
-    EMPTY: (161, 117, 73),
-    TREE: (34, 105, 34),
-    IGNITING: (232, 144, 86),
-    BURNING: (255, 248, 141),
-    SMOLDERING: (112, 14, 14),
-    BURNED: (67,67,67),
-    WATER: (9,55,100),
-}
-
 WIND_FORWARD_NEIGHBORS = {
     "N":  [(-1, -1), (-1, 0), (-1, 1)],
     "NE": [(-1, 0), (-1, 1), (0, 1)],
@@ -51,7 +41,10 @@ class ForestFireModel:
         self.base_grid = grid.copy()
         self.times = np.zeros((height, width), dtype=np.uint8)
 
-        self.fire_start = fire_start
+        if fire_start is None:
+            self.fire_start = np.zeros((self.height, self.width), dtype=np.uint8)
+        else:
+            self.fire_start = fire_start
 
         self.burning_spread_prob = burning_spread_prob
         self.smoldering_spread_prob = smoldering_spread_prob
@@ -70,7 +63,6 @@ class ForestFireModel:
     def reset(self):
         self.grid = self.base_grid.copy()
         self.times = np.zeros((self.height, self.width), dtype=np.uint8)
-        # self.fire_start = np.zeros((self.height, self.width), dtype=np.uint8)
         ignition_mask = (self.fire_start == 1) & (self.grid == TREE)
         self.grid[ignition_mask] = IGNITING
         self.times[ignition_mask] = self.ignition_time

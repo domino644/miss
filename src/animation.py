@@ -1,9 +1,21 @@
 import sys
 import pygame
 from pathlib import Path
-from model import ForestFireModel, COLORS
+from model import ForestFireModel
+from utils import vegetation_map_to_grid, load_fire_start, save_grid_as_png, COLORS
+from simulation_params import (
+    DATA_DIR,
+    BURNING_SPREAD_PROB,
+    SMOLDERING_SPREAD_PROB,
+    IGNITION_TIME,
+    BURNING_TIME,
+    SMOLDERING_TIME,
+    BURNING_WIND_BONUS,
+    SMOLDERING_WIND_BONUS,
+    WIND_DIRECTION,
+)
 
-from convert_to_grid import vegetation_map_to_grid, load_fire_start
+OUTPUT_IMAGE_PATH = "yacutz_animation_result.png"
 
 # =========================
 # Configuration
@@ -11,11 +23,6 @@ from convert_to_grid import vegetation_map_to_grid, load_fire_start
 CELL_SIZE = 2
 FPS = 40
 STEP_DELAY_MS = 0
-
-OUTPUT_IMAGE_PATH = r"yacutz_simulation_result.png"
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "data" / "yacutz"
 
 GRID = vegetation_map_to_grid(
     DATA_DIR / "vegetation_river_before.png"
@@ -29,17 +36,6 @@ FIRE_START = load_fire_start(
     GRID_WIDTH,
     GRID_HEIGHT,
 )
-
-BURNING_SPREAD_PROB = 0.07
-SMOLDERING_SPREAD_PROB = 0.008
-
-IGNITION_TIME = 5
-BURNING_TIME = 2
-SMOLDERING_TIME = 16
-
-BURNING_WIND_BONUS = 0.03
-SMOLDERING_WIND_BONUS = 0.004
-WIND_DIRECTION = "E"
 
 class SimulationApp:
     def __init__(self):
@@ -96,7 +92,7 @@ class SimulationApp:
 
             if not still_burning:
                 self.render()
-                pygame.image.save(self.screen, OUTPUT_IMAGE_PATH)
+                save_grid_as_png(self.model.grid, OUTPUT_IMAGE_PATH)
                 print(f"Saved final state to: {OUTPUT_IMAGE_PATH}")
                 self.running = False
 
