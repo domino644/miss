@@ -4,8 +4,11 @@ import random
 
 EMPTY = 0
 TREE = 1
-BURNING = 2
-WATER = 3
+IGNITING = 2
+BURNING = 3
+SMOLDERING = 4
+BURNED = 5
+WATER = 6
 
 COLOR_TO_STATE = {
     (0, 160, 0): TREE,        # #00a000
@@ -31,6 +34,10 @@ def downsample_grid_by_n(grid: np.ndarray, n: int) -> np.ndarray:
             #     downsampled[y, x] = TREE
             #     continue
 
+            if np.any(block == WATER):
+                downsampled[y, x] = WATER
+                continue
+
             values, counts = np.unique(block, return_counts=True)
             max_count = counts.max()
             candidates = values[counts == max_count]
@@ -51,7 +58,7 @@ def vegetation_map_to_grid(image_path: str) -> np.ndarray:
         mask = np.all(pixels == color, axis=2)
         grid[mask] = state
 
-    return downsample_grid_by_n(grid, 4)
+    return downsample_grid_by_n(grid, 3)
     # return grid
 
 def load_fire_start(image_path: str, width: int, height: int) -> np.ndarray:
