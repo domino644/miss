@@ -1,0 +1,17 @@
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "data" / "yacutz"
+
+OUTPUT_IMAGE_PATH = "yacutz_simulation_result.png"
+
+BURNING_SPREAD_PROB = 0.07
+SMOLDERING_SPREAD_PROB = 0.008
+
+IGNITION_TIME = 5
+BURNING_TIME = 2
+SMOLDERING_TIME = 16
+
+BURNING_WIND_BONUS = 0.03
+SMOLDERING_WIND_BONUS = 0.004
+WIND_DIRECTION = "E"
