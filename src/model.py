@@ -115,7 +115,7 @@ class ForestFireModel:
                 else:
                     current_prob = self.smoldering_spread_prob
                     new_time = 0
-                    new_state = BURNED
+                    new_state = EMPTY
 
                 for ny, nx, dy, dx in self.neighbors(y, x):
                     if self.grid[ny, nx] == TREE:

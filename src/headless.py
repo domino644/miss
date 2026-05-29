@@ -13,10 +13,10 @@ from simulation_params import (
     WIND_DIRECTION,
 )
 
-OUTPUT_IMAGE_PATH = "yacutz_headless_ground_truth.png"
+OUTPUT_IMAGE_PATH = "rhodos_headless_result.png"
 
 GRID = vegetation_map_to_grid(
-    DATA_DIR / "vegetation_river_after.png"
+    DATA_DIR / "vegetation_before.png"
 )
 
 GRID_HEIGHT = GRID.shape[0]
@@ -34,7 +34,7 @@ class HeadlessApp:
             width=GRID_WIDTH,
             height=GRID_HEIGHT,
             grid=GRID,
-            fire_start=None,
+            fire_start=FIRE_START,
             burning_spread_prob=BURNING_SPREAD_PROB,
             smoldering_spread_prob=SMOLDERING_SPREAD_PROB,
             ignition_time=IGNITION_TIME,

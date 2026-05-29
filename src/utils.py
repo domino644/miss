@@ -88,3 +88,18 @@ def save_grid_as_png(grid: np.ndarray, output_path: str):
 
     img = Image.fromarray(img_array, mode="RGB")
     img.save(output_path)
+
+def empty_mask_iou(sim_grid: np.ndarray, sat_grid: np.ndarray, empty=0) -> float:
+    if sim_grid.shape != sat_grid.shape:
+        raise ValueError("sim_grid and sat_grid must have the same shape")
+
+    sim_empty = sim_grid == empty
+    sat_empty = sat_grid == empty
+
+    intersection = np.sum(sim_empty & sat_empty)
+    union = np.sum(sim_empty | sat_empty)
+
+    if union == 0:
+        return 1.0
+
+    return float(intersection / union)
