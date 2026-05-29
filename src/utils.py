@@ -27,6 +27,48 @@ COLORS = {
     WATER: (9,55,100),
 }
 
+PIXEL_RATIOS = {
+    'yacutz': (73, 3000),
+    'rhodos': (33, 800)
+}
+
+def adjust_resolution(grid: np.ndarray, fire_name: str, m_per_pixel: int) -> np.ndarray:
+    old_height, old_width = grid.shape
+
+    pixel_ratio = PIXEL_RATIOS[fire_name]
+
+    height_in_m = int(old_height * (pixel_ratio[1] / pixel_ratio[0]))
+    width_in_m = int(old_width * (pixel_ratio[1] / pixel_ratio[0]))
+
+    new_height = height_in_m // m_per_pixel
+    new_width = width_in_m // m_per_pixel
+
+    n = old_height / new_height
+
+    adjusted = np.zeros((new_height, new_width), dtype=np.uint8)
+
+    for y in range(new_height):
+        for x in range(new_width):
+            block = grid[int(n*y):min(int(n*y+n), old_height - 1), int(n*x):min(int(n*x+n), old_width - 1)].flatten()
+
+            # Priorytet: jeśli gdziekolwiek jest TREE, wynik = TREE
+            # if np.any(block == TREE):
+            #     downsampled[y, x] = TREE
+            #     continue
+
+            if np.any(block == WATER):
+                adjusted[y, x] = WATER
+                continue
+
+            values, counts = np.unique(block, return_counts=True)
+            max_count = counts.max()
+            candidates = values[counts == max_count]
+
+            # Jeśli remis, losowo
+            adjusted[y, x] = random.choice(candidates.tolist())
+
+    return adjusted
+
 def downsample_grid_by_n(grid: np.ndarray, n: int) -> np.ndarray:
     old_height, old_width = grid.shape
 
