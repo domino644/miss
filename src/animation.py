@@ -1,7 +1,7 @@
 import sys
 import pygame
 from pathlib import Path
-from model import ForestFireModel
+from model_optimized import ForestFireModel
 from utils import vegetation_map_to_grid, load_fire_start, save_grid_as_png, COLORS
 from simulation_params import (
     DATA_DIR,

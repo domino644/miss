@@ -1,5 +1,5 @@
 from pathlib import Path
-from model import ForestFireModel
+from model_optimized import ForestFireModel
 from utils import vegetation_map_to_grid, load_fire_start, save_grid_as_png
 from simulation_params import (
     DATA_DIR,
@@ -13,10 +13,10 @@ from simulation_params import (
     WIND_DIRECTION,
 )
 
-OUTPUT_IMAGE_PATH = "rhodos_headless_result.png"
+OUTPUT_IMAGE_PATH = "rhodos_headless_result_optimized.png"
 
 GRID = vegetation_map_to_grid(
-    DATA_DIR / "vegetation_before.png"
+    DATA_DIR / "vegetation_river_before.png"
 )
 
 GRID_HEIGHT = GRID.shape[0]
@@ -49,8 +49,10 @@ class HeadlessApp:
     def run(self, save_to_image):
         if self.simulations_ran > 0:
             self.model.reset()
+        steps = 0
         while True:
             still_burning = self.model.step()
+            steps += 1
             if not still_burning:
                 self.simulations_ran += 1
                 break
@@ -58,9 +60,10 @@ class HeadlessApp:
         if save_to_image:
             save_grid_as_png(self.model.grid, OUTPUT_IMAGE_PATH)
         
-        return self.model.grid.copy()
+        return self.model.grid.copy(), steps
             
 
 if __name__ == "__main__":
     app = HeadlessApp()
-    app.run(True)
+    _, steps = app.run(True)
+    print(steps)

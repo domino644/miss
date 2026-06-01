@@ -37,19 +37,25 @@ def adjust_resolution(grid: np.ndarray, fire_name: str, m_per_pixel: int) -> np.
 
     pixel_ratio = PIXEL_RATIOS[fire_name]
 
-    height_in_m = int(old_height * (pixel_ratio[1] / pixel_ratio[0]))
-    width_in_m = int(old_width * (pixel_ratio[1] / pixel_ratio[0]))
+    height_in_m = old_height * (pixel_ratio[1] / pixel_ratio[0])
+    width_in_m = old_width * (pixel_ratio[1] / pixel_ratio[0])
 
-    new_height = height_in_m // m_per_pixel
-    new_width = width_in_m // m_per_pixel
+    new_height = round(height_in_m / m_per_pixel)
+    new_width = round(width_in_m / m_per_pixel)
 
-    n = old_height / new_height
+    scale_y = old_height / new_height
+    scale_x = old_width / new_width
 
     adjusted = np.zeros((new_height, new_width), dtype=np.uint8)
 
     for y in range(new_height):
         for x in range(new_width):
-            block = grid[int(n*y):min(int(n*y+n), old_height - 1), int(n*x):min(int(n*x+n), old_width - 1)].flatten()
+            y0 = int(scale_y * y)
+            y1 = int(scale_y * (y + 1))
+            x0 = int(scale_x * x)
+            x1 = int(scale_x * (x + 1))
+
+            block = grid[y0:y1, x0:x1].flatten()
 
             # Priorytet: jeśli gdziekolwiek jest TREE, wynik = TREE
             # if np.any(block == TREE):
@@ -110,7 +116,7 @@ def vegetation_map_to_grid(image_path: str) -> np.ndarray:
         mask = np.all(pixels == color, axis=2)
         grid[mask] = state
 
-    return downsample_grid_by_n(grid, 3)
+    return adjust_resolution(grid, 'yacutz', 120)
     # return grid
 
 def load_fire_start(image_path: str, width: int, height: int) -> np.ndarray:
