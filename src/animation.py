@@ -1,10 +1,11 @@
 import sys
 import pygame
-from pathlib import Path
-from model_optimized import ForestFireModel
+import random
+from model import ForestFireModel
 from utils import vegetation_map_to_grid, load_fire_start, save_grid_as_png, COLORS
 from simulation_params import (
     DATA_DIR,
+    EXPECTED_STEPS,
     BURNING_SPREAD_PROB,
     SMOLDERING_SPREAD_PROB,
     IGNITION_TIME,
@@ -12,7 +13,10 @@ from simulation_params import (
     SMOLDERING_TIME,
     BURNING_WIND_BONUS,
     SMOLDERING_WIND_BONUS,
-    WIND_DIRECTION,
+    WIND_SCHEDULE,
+    RAIN_SCHEDULE,
+    RAIN_MULTIPLIER,
+    EXTINGUISH_PROB
 )
 
 OUTPUT_IMAGE_PATH = "yacutz_animation_result.png"
@@ -53,17 +57,23 @@ class SimulationApp:
             width=GRID_WIDTH,
             height=GRID_HEIGHT,
             grid=GRID,
+            expected_steps=EXPECTED_STEPS,
             fire_start=FIRE_START,
+            rain_schedule=RAIN_SCHEDULE,
             burning_spread_prob=BURNING_SPREAD_PROB,
             smoldering_spread_prob=SMOLDERING_SPREAD_PROB,
             ignition_time=IGNITION_TIME,
             burning_time=BURNING_TIME,
             smoldering_time=SMOLDERING_TIME,
-            wind_direction=WIND_DIRECTION,
+            wind_schedule=WIND_SCHEDULE,
             burning_wind_bonus=BURNING_WIND_BONUS,
-            smoldering_wind_bonus=SMOLDERING_WIND_BONUS
+            smoldering_wind_bonus=SMOLDERING_WIND_BONUS,
+            rain_multiplier=RAIN_MULTIPLIER,
+            extinguish_probability=EXTINGUISH_PROB
         )
 
+        self.raindrops = []
+        self.rain_intensity = 0.001
         self.running = True
 
     def draw_grid(self):
@@ -87,18 +97,46 @@ class SimulationApp:
     def update(self):
         now = pygame.time.get_ticks()
         if now - self.last_step_time >= STEP_DELAY_MS:
-            still_burning = self.model.step()
+            still_burning, steps = self.model.step()
             self.last_step_time = now
+
+            if getattr(self.model, "rain_active", False):
+                for _ in range(50):
+                    x = random.randint(0, GRID_WIDTH - 1)
+                    y = 0
+                    self.raindrops.append([x, y])
+
+            for drop in self.raindrops:
+                drop[1] += 1
+
+            self.raindrops = [drop for drop in self.raindrops if drop[1] < GRID_HEIGHT]
 
             if not still_burning:
                 self.render()
                 save_grid_as_png(self.model.grid, OUTPUT_IMAGE_PATH)
                 print(f"Saved final state to: {OUTPUT_IMAGE_PATH}")
+                print(f"Total steps: {steps}")
                 self.running = False
 
     def render(self):
         self.screen.fill((0, 0, 0))
         self.draw_grid()
+
+        # Draw rain if active
+        if getattr(self.model, "rain_active", False):
+            num_rain_drops = int(GRID_WIDTH * GRID_HEIGHT * self.rain_intensity)
+            for _ in range(num_rain_drops):
+                x = random.randint(0, GRID_WIDTH - 1)
+                y = random.randint(0, GRID_HEIGHT - 1)
+                rect = pygame.Rect(
+                    x * CELL_SIZE,
+                    y * CELL_SIZE,
+                    CELL_SIZE,
+                    CELL_SIZE,
+                )
+                pygame.draw.rect(self.screen, (0, 150, 255), rect)
+
+
         pygame.display.flip()
 
     def run(self):

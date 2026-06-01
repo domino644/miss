@@ -3,7 +3,7 @@ import numpy as np
 from utils import vegetation_map_to_grid, load_fire_start, save_grid_as_png
 import random
 from model import ForestFireModel as ModelOriginal
-from model_optimized import ForestFireModel as ModelOptimized
+from model import ForestFireModel as ModelOptimized
 from simulation_params import (
     DATA_DIR,
     BURNING_SPREAD_PROB,
