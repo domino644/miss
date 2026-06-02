@@ -147,10 +147,7 @@ def empty_mask_iou(sim_grid: np.ndarray, sat_grid: np.ndarray, steps: int, exp_s
     intersection = np.sum(sim_empty & sat_empty)
     union = np.sum(sim_empty | sat_empty)
     
-    if steps == 0:
-        steps_factor = float('inf')
-    else:
-        steps_factor = max(steps, exp_steps) / min(steps, exp_steps)
+    steps_factor = min(steps, exp_steps) / max(steps, exp_steps)
 
     if union == 0:
         return 1.0 * steps_factor
