@@ -2,12 +2,12 @@ from pathlib import Path
 
 # 1 step = 0,25h
 
-#Yacutz
+FIRE_NAME = 'yacutz'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data" / "yacutz"
 
-EXPECTED_STEPS = 1000
+EXPECTED_STEPS = 4032
 
 BURNING_SPREAD_PROB = 0.0028491161871582992
 SMOLDERING_SPREAD_PROB = 0.002603227632492113

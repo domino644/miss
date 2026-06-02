@@ -137,7 +137,7 @@ def save_grid_as_png(grid: np.ndarray, output_path: str):
     img = Image.fromarray(img_array, mode="RGB")
     img.save(output_path)
 
-def empty_mask_iou(sim_grid: np.ndarray, sat_grid: np.ndarray, empty=0) -> float:
+def empty_mask_iou(sim_grid: np.ndarray, sat_grid: np.ndarray, steps: int, exp_steps:int, empty=0) -> float:
     if sim_grid.shape != sat_grid.shape:
         raise ValueError("sim_grid and sat_grid must have the same shape")
 
@@ -146,8 +146,13 @@ def empty_mask_iou(sim_grid: np.ndarray, sat_grid: np.ndarray, empty=0) -> float
 
     intersection = np.sum(sim_empty & sat_empty)
     union = np.sum(sim_empty | sat_empty)
+    
+    if steps == 0:
+        steps_factor = float('inf')
+    else:
+        steps_factor = max(steps, exp_steps) / min(steps, exp_steps)
 
     if union == 0:
-        return 1.0
+        return 1.0 * steps_factor
 
-    return float(intersection / union)
+    return float(intersection / union) * steps_factor
