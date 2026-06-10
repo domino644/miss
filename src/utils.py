@@ -105,7 +105,7 @@ def downsample_grid_by_n(grid: np.ndarray, n: int) -> np.ndarray:
 
     return downsampled
 
-def vegetation_map_to_grid(image_path: str) -> np.ndarray:
+def vegetation_map_to_grid(image_path: str, fire_name: str) -> np.ndarray:
     img = Image.open(image_path).convert("RGB")
     pixels = np.array(img)  # shape: (height, width, 3)
 
@@ -116,7 +116,7 @@ def vegetation_map_to_grid(image_path: str) -> np.ndarray:
         mask = np.all(pixels == color, axis=2)
         grid[mask] = state
 
-    return adjust_resolution(grid, 'yacutz', 120)
+    return adjust_resolution(grid, fire_name, 120)
     # return grid
 
 def load_fire_start(image_path: str, width: int, height: int) -> np.ndarray:
