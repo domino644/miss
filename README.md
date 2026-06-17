@@ -85,7 +85,7 @@ Do optymalizacji wykorzystano bibliotekę Optuna oraz sampler TPE, czyli Tree-st
 
 #### Najlepszy wynik symulacji
 
-![Rodos - najlepszy wynik symulacji](src/rhodos_headless_result_optimized.png)
+![Rodos - najlepszy wynik symulacji](src/rhodos_animation_result.png)
 
 ### 8.2. Pożar w Jakucku, lipiec 2021
 
