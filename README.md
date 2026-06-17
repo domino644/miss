@@ -1,78 +1,118 @@
-# Projekt: Modelowanie i symulacja pożarów lasów
+# Modelowanie i symulacja pożarów lasów
 
-## 1. Autorzy
+## Autorzy
+
 - Łukasz Wilański
-- Jakub Ciszewski
+- Kuba Ciszewski
 
-## 2. Wstęp
-Pożary lasów stanowią jedno z najpoważniejszych zagrożeń środowiskowych współczesnego świata. W ostatnich latach szczególnie dotkliwe skutki tego zjawiska obserwowane są w Ameryce Północnej, gdzie wysokie temperatury, długotrwałe susze, silny wiatr oraz działalność człowieka sprzyjają powstawaniu i rozprzestrzenianiu się ognia. Skala strat obejmuje nie tylko zniszczenie ekosystemów, lecz także ogromne koszty gospodarcze i społeczne.
+## 1. Wstęp
 
-Celem naszego projektu jest stworzenie uproszczonego modelu symulacyjnego pożarów lasów oraz zbadanie, czy rozkład wielkości pożarów może być opisywany przez rozkład potęgowy (*power law*). Interesuje nas również wskazanie czynników, które w największym stopniu wpływają na prawdopodobieństwo wystąpienia dużych pożarów, a także zaproponowanie działań, które mogłyby ograniczać ryzyko ich powstawania.
+Pożary lasów są jednym z najpoważniejszych zagrożeń środowiskowych współczesnego świata. Występują na wielu kontynentach i prowadzą do ogromnych strat ekologicznych, gospodarczych oraz społecznych. Ich skutki obejmują niszczenie ekosystemów, emisję dużych ilości dwutlenku węgla, degradację gleby, zagrożenie dla ludzi i zwierząt, a także wysokie koszty akcji ratowniczych oraz odbudowy zniszczonych terenów.
 
-Więcej o tym można znaleźć w paperze - [Critical Behaviour of the Drossel-Schwabl Forest Fire Model](https://arxiv.org/abs/cond-mat/0202022).
+Zjawisko pożaru lasu jest trudne do przewidzenia, ponieważ zależy od wielu czynników działających jednocześnie. Na tempo rozprzestrzeniania się ognia wpływają między innymi rodzaj i gęstość roślinności, wilgotność, wiatr, opady deszczu, ukształtowanie terenu oraz działania człowieka. Z tego powodu analiza rzeczywistych pożarów wymaga nie tylko obserwacji danych historycznych, ale również tworzenia modeli, które pozwalają badać różne scenariusze rozwoju pożaru.
 
-## 3. Opis problemu
-Pożary lasów są zjawiskiem złożonym, wynikającym z oddziaływania wielu czynników losowych i środowiskowych. Ogień może zostać zapoczątkowany przez naturalne źródła, takie jak pioruny, ale również przez działalność człowieka. Po rozpoczęciu pożaru jego dalszy rozwój zależy między innymi od gęstości roślinności, warunków pogodowych, ukształtowania terenu oraz obecności naturalnych barier, takich jak rzeki czy obszary pozbawione drzew.
+Symulowanie pożarów jest istotne, ponieważ umożliwia lepsze zrozumienie mechanizmów odpowiedzialnych za rozprzestrzenianie się ognia. Dzięki modelom symulacyjnym można sprawdzać, jak zmiana warunków środowiskowych wpływa na końcowy zasięg pożaru, które parametry są najważniejsze dla powstawania dużych pożarów oraz jakie działania mogą ograniczyć ryzyko rozprzestrzeniania się ognia.
 
-W literaturze i analizach statystycznych często zwraca się uwagę, że wielkość pożarów nie rozkłada się równomiernie — większość pożarów jest mała, natomiast nieliczne osiągają bardzo duże rozmiary. Tego typu zachowanie może sugerować występowanie rozkładu potęgowego, który często pojawia się w układach złożonych i procesach o charakterze krytycznym.
+## 2. Model symulacyjny
 
-Jako materiał wprowadzający do problemu można wykorzystać krótki film edukacyjny National Geographic:
+W projekcie wykorzystano model oparty na automacie komórkowym. Obszar symulacji reprezentowany jest jako dwuwymiarowa siatka komórek, gdzie każda komórka odpowiada fragmentowi terenu. W zależności od danych wejściowych komórka może oznaczać na przykład drzewo, teren pusty, wodę lub komórkę znajdującą się w jednym z etapów spalania.
 
-[Wildfires 101 | National Geographic](https://www.youtube.com/watch?v=5hghT1W33cY)
+Inspiracją dla projektu był klasyczny model Drossela-Schwabla, czyli jeden z najbardziej znanych automatów komórkowych służących do badania pożarów lasów i zjawisk samoorganizującej się krytyczności. Więcej informacji o tym modelu można znaleźć między innymi w pracy: [Critical Behaviour of the Drossel-Schwabl Forest Fire Model](https://arxiv.org/abs/cond-mat/0202022).
 
-oraz film Veritasium poświęcony tematyce power law:
+Klasyczny model został przez nas rozszerzony o dodatkowe elementy, które pozwalają lepiej odwzorować wybrane aspekty rzeczywistych pożarów. W szczególności uwzględniono wpływ wiatru w jednym z ośmiu kierunków, wpływ deszczu występującego w określonych przedziałach czasu, różne etapy spalania komórki, czas trwania poszczególnych etapów spalania oraz różne prawdopodobieństwa rozprzestrzeniania się ognia w zależności od stanu komórki.
 
-[Power Law](https://youtu.be/HBluLfX2F_k)
+## 3. Dane rzeczywiste i walidacja modelu
 
-## 4. Jak chcemy przeprowadzić symulację
-Planujemy zamodelować las jako dwuwymiarową siatkę o rozmiarze \(n \times m\). Każda komórka mapy będzie reprezentowała fragment terenu, który może należeć do jednej z kilku kategorii, na przykład:
-- drzewo,
-- puste pole,
-- przeszkoda terenowa (np. rzeka lub step),
-- obszar już spalony.
+Jednym z celów projektu było sprawdzenie, czy symulacja może odtworzyć przebieg rzeczywistych pożarów. W tym celu wybrano konkretne pożary, dla których możliwe było pozyskanie danych satelitarnych sprzed i po zdarzeniu.
 
-Symulacja będzie przebiegać w krokach czasowych. W każdym kroku z pewnym prawdopodobieństwem w losową komórkę może uderzyć piorun, inicjując pożar. Następnie ogień będzie rozprzestrzeniał się na sąsiednie komórki zgodnie z ustalonymi regułami, zależnymi od parametrów modelu, takich jak:
-- zagęszczenie drzew w lesie,
-- prawdopodobieństwo zapłonu po uderzeniu pioruna,
-- tempo rozprzestrzeniania się ognia,
-- wpływ przeszkód terenowych ograniczających propagację pożaru,
-- ewentualne dodatkowe warunki środowiskowe.
+Proces walidacji składał się z kilku etapów. Najpierw wybierany był pożar o znanej lokalizacji oraz przybliżonym czasie trwania. Następnie pobierano zdjęcia satelitarne obszaru sprzed pożaru i po pożarze. Do tego wykorzystano dane dostępne przez serwis Copernicus, który umożliwia analizę obrazów satelitarnych i tworzenie map klasyfikacji terenu.
 
-W kolejnych wersjach modelu chcemy rozszerzyć symulację o bardziej realistyczne elementy, takie jak zróżnicowanie terenu lub kierunkowe rozprzestrzenianie się ognia. Dla każdej konfiguracji parametrów będziemy uruchamiać wiele niezależnych symulacji, a następnie analizować rozmiary powstałych pożarów, ich częstość oraz zależność od przyjętych warunków początkowych.
+Na podstawie zdjęć satelitarnych generowano mapy wegetacji. Dzięki nim możliwe było odróżnienie terenów zalesionych od obszarów niezalesionych, wody oraz terenów spalonych. Mapa wegetacji sprzed pożaru była wykorzystywana jako grid startowy symulacji, natomiast mapa po pożarze służyła jako grid referencyjny, z którym porównywano wynik symulacji.
 
-Aby zwalidować wyniki, planujemy porównać dane uzyskane w symulacji ze zbiorem danych dotyczącym rzeczywistych pożarów lasów w Ameryce Północnej. Pozwoli to ocenić, czy model odtwarza najważniejsze cechy badanego zjawiska i czy obserwowany rozkład wielkości pożarów rzeczywiście przypomina rozkład potęgowy.
+## 4. Wersje symulacji
 
-[National Fire Database fire polygon data](https://cwfis.cfs.nrcan.gc.ca/datamart/download/nfdbpoly)
+W projekcie przygotowano dwie wersje symulacji.
 
-Do przeprowadzenia symulacji możemy użyć gotowego [modelu Fire w programie NetLogo](https://ccl.northwestern.edu/netlogo/models/Fire).
+Pierwsza wersja to symulacja wizualna z interfejsem napisanym w PyGame. Umożliwia ona obserwowanie rozprzestrzeniania się ognia na planszy w czasie rzeczywistym. W tej wersji widoczne są różne typy komórek, takie jak drzewa, woda, ogień oraz teren po spaleniu. Do animacji dodano również wizualizację zjawiska deszczu.
 
-## 5. Co chcemy osiągnąć
-Naszym głównym celem jest sprawdzenie, czy nawet stosunkowo prosty model komórkowy potrafi odtworzyć podstawowe własności rzeczywistych pożarów lasów. W szczególności chcemy:
-- zbadać, czy rozmiary pożarów w symulacji wykazują cechy rozkładu *power law*,
-- określić, które parametry modelu mają największy wpływ na powstawanie dużych pożarów,
-- porównać wyniki symulacji z rzeczywistymi danymi historycznymi,
-- zaproponować możliwe strategie ograniczania ryzyka występowania dużych pożarów, na przykład poprzez zmianę gęstości zalesienia, tworzenie barier terenowych lub inne działania prewencyjne.
+Druga wersja to wersja headless, czyli symulacja bez interfejsu graficznego. Została ona przygotowana z myślą o szybkim wykonywaniu wielu uruchomień symulacji. Taka wersja była potrzebna przede wszystkim do strojenia hiperparametrów, ponieważ proces optymalizacji wymagał uruchomienia symulacji wiele razy dla różnych zestawów parametrów.
 
-Ostatecznie projekt ma pokazać, że modelowanie i symulacja mogą być użytecznym narzędziem do analizy złożonych zjawisk przyrodniczych oraz do wspierania decyzji związanych z ochroną środowiska i zarządzaniem kryzysowym.
+## 5. Analizowane pożary
 
-## 6. Rozszerzenie bazowego modelu
+W projekcie skupiono się na dwóch rzeczywistych pożarach.
 
-Chcemy rozszerzyć bazowy model o heterogeniczne środowisko, w którym prawdopodobieństwo zapłonu zależy od lokalnych cech komórki, przede wszystkim od typu roślinności i gęstości roślinności. Oprzemy to na podejściu z modelu Alexandridisa, w którym:
+Pierwszym analizowanym przypadkiem był pożar na greckiej wyspie Rodos w lipcu 2023 roku. Dla tego pożaru udało się pozyskać dokładne dane o początku zdarzenia z NASA FIRMS oraz dane meteorologiczne. Pożar ten był gaszony przez służby, co oznacza, że jego rzeczywisty przebieg był zależny nie tylko od warunków naturalnych, ale również od działań człowieka.
 
-$p_{burn} = p_0 (1 + p_{veg}) (1 + p_{den}) p_w p_s$
+Drugim analizowanym przypadkiem był pożar w okolicach Jakucka w lipcu 2021 roku. W tym przypadku udało się pozyskać dane satelitarne przed i po pożarze, jednak nie udało się uzyskać równie dokładnych danych meteorologicznych jak dla Rodos. Istotną różnicą było również to, że pożar w Jakucku nie był gaszony w takim stopniu jak pożar na Rodos, przez co jego przebieg mógł być bardziej zbliżony do naturalnego rozwoju ognia.
 
-gdzie $p_0$ to bazowe prawdopodobieństwo zapłonu, $p_{veg}$ opisuje wpływ typu roślinności, $p_{den}$ wpływ gęstości roślinności, $p_w$ wpływ wiatru, a $p_s$ wpływ nachylenia terenu.
+## 6. Metryka jakości symulacji
 
-W naszym modelu chcemy uwzględnić typ roślinności, gęstość roślinności, wiatr oraz obecność dróg i cieków wodnych, które mogą działać jako bariery ograniczające rozprzestrzenianie się ognia. Dodatkowo w przyszłości można rozważyć przejście ze stanów dyskretnych na stany ciągłe, gdzie stan komórki opisywałby np. stopień spalenia paliwa lub intensywność pożaru.
+Do oceny jakości symulacji wykorzystano porównanie obszaru spalonego w symulacji z obszarem spalonym widocznym na mapie satelitarnej po pożarze. W tym celu zastosowano metrykę IoU, czyli Intersection over Union.
 
-Korzyścią z zastosowania rozszerzonego modelu jest przede wszystkim większy realizm symulacji. W przeciwieństwie do bazowego automatu, taki model uwzględnia lokalne zróżnicowanie środowiska, na przykład typ i gęstość roślinności, wiatr, teren, drogi i cieki wodne, dzięki czemu lepiej odwzorowuje rzeczywiste warunki rozprzestrzeniania się pożaru.
+Metryka IoU mierzy podobieństwo dwóch masek binarnych. W naszym przypadku porównywana była maska terenów pustych lub spalonych uzyskana z symulacji z analogiczną maską uzyskaną z danych satelitarnych po pożarze. Wartość IoU jest obliczana jako stosunek części wspólnej dwóch masek do ich sumy.
 
-Rozszerzone modele są zwykle trafniejsze od prostego modelu bazowego, ponieważ pozwalają lepiej przewidywać kierunek i tempo propagacji ognia. Jednocześnie zachowują zaletę automatów komórkowych, czyli stosunkowo niską złożoność obliczeniową i możliwość szybkiej symulacji dużych obszarów.
+Im większa wartość IoU, tym lepiej wynik symulacji pokrywa się z rzeczywistym obszarem spalonym. Metryka ta pozwala jednocześnie karać sytuacje, w których symulacja spaliła zbyt duży obszar, oraz sytuacje, w których nie odtworzyła obszarów rzeczywiście spalonych.
 
-Źródła:
+Oprócz samego kształtu spalonego obszaru brano pod uwagę również czas trwania symulacji. W symulacji przyjęto, że jedna komórka odpowiada obszarowi o wymiarach 120 m x 120 m. Przyjęto również, że jeden krok symulacji odpowiada około 30 minutom czasu rzeczywistego.
 
-https://www.mdpi.com/2571-6255/9/3/108
+## 7. Tuning hiperparametrów
 
-https://nhess.copernicus.org/articles/19/169/2019/
+Po opracowaniu sposobu oceny wyników symulacji przeprowadzono strojenie hiperparametrów modelu. Celem optymalizacji było znalezienie takiego zestawu parametrów, który pozwalał jak najlepiej odwzorować rzeczywisty przebieg pożaru.
 
+Łącznie optymalizowano 11 hiperparametrów. Część z nich była parametrami ciągłymi typu float, na przykład prawdopodobieństwo rozprzestrzenienia się ognia lub wpływ wiatru. Inne były parametrami całkowitymi, takimi jak czas zapłonu, czas aktywnego spalania oraz czas tlenia komórki.
 
+Do optymalizacji wykorzystano bibliotekę Optuna oraz sampler TPE, czyli Tree-structured Parzen Estimator. Optymalizacja była wykonywana na superkomputerze Ares.
+
+## 8. Wyniki
+
+### 8.1. Pożar na Rodos, lipiec 2023
+
+#### Zdjęcie satelitarne przed pożarem
+
+![Rodos - zdjęcie satelitarne przed pożarem](data/rhodos/before.png)
+
+#### Mapa wegetacji przed pożarem
+
+![Rodos - mapa wegetacji przed pożarem](data/rhodos/vegetation_before.png)
+
+#### Zdjęcie satelitarne po pożarze
+
+![Rodos - zdjęcie satelitarne po pożarze](data/rhodos/after.png)
+
+#### Mapa wegetacji po pożarze
+
+![Rodos - mapa wegetacji po pożarze](data/rhodos/vegetation_after.png)
+
+#### Najlepszy wynik symulacji
+
+![Rodos - najlepszy wynik symulacji](src/rhodos_headless_result_optimized.png)
+
+### 8.2. Pożar w Jakucku, lipiec 2021
+
+#### Zdjęcie satelitarne przed pożarem
+
+![Jakuck - zdjęcie satelitarne przed pożarem](data/yacutz/before.png)
+
+#### Mapa wegetacji przed pożarem
+
+![Jakuck - mapa wegetacji przed pożarem](data/yacutz/vegetation_river_before.png)
+
+#### Zdjęcie satelitarne po pożarze
+
+![Jakuck - zdjęcie satelitarne po pożarze](data/yacutz/after.png)
+
+#### Mapa wegetacji po pożarze
+
+![Jakuck - mapa wegetacji po pożarze](data/yacutz/vegetation_river_after.png)
+
+#### Najlepszy wynik symulacji
+
+![Jakuck - najlepszy wynik symulacji](src/yacutz_headless_optimal_result.png)
+
+## 9. Wnioski
+
+W ramach projektu udało się w pewnym stopniu odwzorować przebieg rzeczywistych pożarów lasów na podstawie przygotowanego modelu automatu komórkowego. Dla pożaru na Rodos uzyskano najlepsze dopasowanie na poziomie około 70%, natomiast dla pożaru w Jakucku najlepszy wynik wyniósł około 57%. Oznacza to, że model był w stanie częściowo odtworzyć kształt i zasięg spalonego obszaru, szczególnie po przeprowadzeniu strojenia hiperparametrów.
+
+Jednocześnie należy podkreślić, że rzeczywiste pożary lasów są zjawiskami bardzo złożonymi i zależą od wielu losowych oraz trudnych do zmierzenia czynników. Na ich przebieg wpływają między innymi lokalne warunki pogodowe, zmienność kierunku i siły wiatru, wilgotność roślinności, ukształtowanie terenu, rodzaj paliwa roślinnego oraz działania służb gaśniczych. Wielu z tych czynników nie byliśmy w stanie w pełni uwzględnić w naszej symulacji.
+
+Mimo tych ograniczeń projekt pokazał, że automat komórkowy może być użytecznym narzędziem do przybliżonego modelowania rozprzestrzeniania się pożarów lasów. Uzyskane wyniki potwierdzają, że nawet uproszczony model, po odpowiedniej kalibracji, może odtwarzać ogólne tendencje rozwoju pożaru i stanowić podstawę do dalszych, bardziej zaawansowanych eksperymentów.
