@@ -1,0 +1,76 @@
+from model import ForestFireModel
+from utils import vegetation_map_to_grid, load_fire_start, save_grid_as_png
+from simulation_params import (
+    DATA_DIR,
+    EXPECTED_STEPS,
+    BURNING_SPREAD_PROB,
+    SMOLDERING_SPREAD_PROB,
+    IGNITION_TIME,
+    BURNING_TIME,
+    SMOLDERING_TIME,
+    BURNING_WIND_BONUS,
+    SMOLDERING_WIND_BONUS,
+    WIND_SCHEDULE,
+    RAIN_SCHEDULE,
+    RAIN_MULTIPLIER,
+    EXTINGUISH_PROB,
+    FIRE_NAME
+)
+
+OUTPUT_IMAGE_PATH = "yacutz_headless_optimal_result.png"
+
+GRID = vegetation_map_to_grid(
+    DATA_DIR / "vegetation_river_before.png",
+    FIRE_NAME
+)
+
+GRID_HEIGHT = GRID.shape[0]
+GRID_WIDTH = GRID.shape[1]
+
+FIRE_START = load_fire_start(
+    DATA_DIR / "fire_start_grid.png",
+    GRID_WIDTH,
+    GRID_HEIGHT,
+)
+
+class HeadlessApp:
+    def __init__(self):
+        self.model = ForestFireModel(
+            width=GRID_WIDTH,
+            height=GRID_HEIGHT,
+            grid=GRID,
+            expected_steps=EXPECTED_STEPS,
+            fire_start=FIRE_START,
+            rain_schedule=RAIN_SCHEDULE,
+            burning_spread_prob=BURNING_SPREAD_PROB,
+            smoldering_spread_prob=SMOLDERING_SPREAD_PROB,
+            ignition_time=IGNITION_TIME,
+            burning_time=BURNING_TIME,
+            smoldering_time=SMOLDERING_TIME,
+            wind_schedule=WIND_SCHEDULE,
+            burning_wind_bonus=BURNING_WIND_BONUS,
+            smoldering_wind_bonus=SMOLDERING_WIND_BONUS,
+            rain_multiplier=RAIN_MULTIPLIER,
+            extinguish_probability=EXTINGUISH_PROB
+        )
+        self.simulations_ran = 0
+
+    def run(self, save_to_image):
+        if self.simulations_ran > 0:
+            self.model.reset()
+        while True:
+            still_burning, steps = self.model.step()
+            if not still_burning:
+                self.simulations_ran += 1
+                break
+        
+        if save_to_image:
+            save_grid_as_png(self.model.grid, OUTPUT_IMAGE_PATH)
+        
+        return self.model.grid.copy(), steps
+            
+
+if __name__ == "__main__":
+    app = HeadlessApp()
+    _, steps = app.run(True)
+    print(steps)

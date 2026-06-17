@@ -1,0 +1,157 @@
+import sys
+import pygame
+import random
+from model import ForestFireModel
+from utils import vegetation_map_to_grid, load_fire_start, save_grid_as_png, COLORS
+from simulation_params import (
+    DATA_DIR,
+    EXPECTED_STEPS,
+    BURNING_SPREAD_PROB,
+    SMOLDERING_SPREAD_PROB,
+    IGNITION_TIME,
+    BURNING_TIME,
+    SMOLDERING_TIME,
+    BURNING_WIND_BONUS,
+    SMOLDERING_WIND_BONUS,
+    WIND_SCHEDULE,
+    RAIN_SCHEDULE,
+    RAIN_MULTIPLIER,
+    EXTINGUISH_PROB,
+    FIRE_NAME
+)
+
+OUTPUT_IMAGE_PATH = f"{FIRE_NAME}_animation_result.png"
+# OUTPUT_IMAGE_PATH = "rhodos_ground_truth.png"
+
+# =========================
+# Configuration
+# =========================
+CELL_SIZE = 2
+FPS = 40
+STEP_DELAY_MS = 0
+
+GRID = vegetation_map_to_grid(
+    DATA_DIR / "vegetation_before.png",
+    FIRE_NAME
+)
+
+GRID_HEIGHT = GRID.shape[0]
+GRID_WIDTH = GRID.shape[1]
+
+FIRE_START = load_fire_start(
+    DATA_DIR / "fire_start_grid.png",
+    GRID_WIDTH,
+    GRID_HEIGHT,
+)
+
+class SimulationApp:
+    def __init__(self):
+        pygame.init()
+        pygame.display.set_caption("Forest Fire Simulation")
+
+        self.screen_width = GRID_WIDTH * CELL_SIZE
+        self.screen_height = GRID_HEIGHT * CELL_SIZE
+
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        self.clock = pygame.time.Clock()
+        self.last_step_time = 0
+
+        self.model = ForestFireModel(
+            width=GRID_WIDTH,
+            height=GRID_HEIGHT,
+            grid=GRID,
+            expected_steps=EXPECTED_STEPS,
+            fire_start=FIRE_START,
+            rain_schedule=RAIN_SCHEDULE,
+            burning_spread_prob=BURNING_SPREAD_PROB,
+            smoldering_spread_prob=SMOLDERING_SPREAD_PROB,
+            ignition_time=IGNITION_TIME,
+            burning_time=BURNING_TIME,
+            smoldering_time=SMOLDERING_TIME,
+            wind_schedule=WIND_SCHEDULE,
+            burning_wind_bonus=BURNING_WIND_BONUS,
+            smoldering_wind_bonus=SMOLDERING_WIND_BONUS,
+            rain_multiplier=RAIN_MULTIPLIER,
+            extinguish_probability=EXTINGUISH_PROB
+        )
+
+        self.raindrops = []
+        self.rain_intensity = 0.001
+        self.running = True
+
+    def draw_grid(self):
+        for y in range(self.model.height):
+            for x in range(self.model.width):
+                state = self.model.grid[y, x]
+                color = COLORS[int(state)]
+                rect = pygame.Rect(
+                    x * CELL_SIZE,
+                    y * CELL_SIZE,
+                    CELL_SIZE,
+                    CELL_SIZE,
+                )
+                pygame.draw.rect(self.screen, color, rect)
+
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_step_time >= STEP_DELAY_MS:
+            still_burning, steps = self.model.step()
+            self.last_step_time = now
+
+            if getattr(self.model, "rain_active", False):
+                for _ in range(50):
+                    x = random.randint(0, GRID_WIDTH - 1)
+                    y = 0
+                    self.raindrops.append([x, y])
+
+            for drop in self.raindrops:
+                drop[1] += 1
+
+            self.raindrops = [drop for drop in self.raindrops if drop[1] < GRID_HEIGHT]
+
+            if not still_burning:
+                self.render()
+                save_grid_as_png(self.model.grid, OUTPUT_IMAGE_PATH)
+                print(f"Saved final state to: {OUTPUT_IMAGE_PATH}")
+                print(f"Total steps: {steps}")
+                self.running = False
+
+    def render(self):
+        self.screen.fill((0, 0, 0))
+        self.draw_grid()
+
+        # Draw rain if active
+        if getattr(self.model, "rain_active", False):
+            num_rain_drops = int(GRID_WIDTH * GRID_HEIGHT * self.rain_intensity)
+            for _ in range(num_rain_drops):
+                x = random.randint(0, GRID_WIDTH - 1)
+                y = random.randint(0, GRID_HEIGHT - 1)
+                rect = pygame.Rect(
+                    x * CELL_SIZE,
+                    y * CELL_SIZE,
+                    CELL_SIZE,
+                    CELL_SIZE,
+                )
+                pygame.draw.rect(self.screen, (0, 150, 255), rect)
+
+
+        pygame.display.flip()
+
+    def run(self):
+        while self.running:
+            self.handle_events()
+            self.update()
+            self.render()
+            self.clock.tick(FPS)
+
+        pygame.quit()
+        sys.exit()
+
+if __name__ == "__main__":
+    app = SimulationApp()
+    app.run()

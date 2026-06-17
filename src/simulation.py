@@ -3,7 +3,7 @@ import random
 import numpy as np
 import pygame
 import csv
-from convert_to_grid import vegetation_map_to_grid, load_fire_start
+from utils import vegetation_map_to_grid, load_fire_start
 from PIL import Image
 
 # =========================
