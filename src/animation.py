@@ -16,10 +16,12 @@ from simulation_params import (
     WIND_SCHEDULE,
     RAIN_SCHEDULE,
     RAIN_MULTIPLIER,
-    EXTINGUISH_PROB
+    EXTINGUISH_PROB,
+    FIRE_NAME
 )
 
-OUTPUT_IMAGE_PATH = "yacutz_animation_result.png"
+OUTPUT_IMAGE_PATH = f"{FIRE_NAME}_animation_result.png"
+# OUTPUT_IMAGE_PATH = "rhodos_ground_truth.png"
 
 # =========================
 # Configuration
@@ -29,7 +31,8 @@ FPS = 40
 STEP_DELAY_MS = 0
 
 GRID = vegetation_map_to_grid(
-    DATA_DIR / "vegetation_river_before.png"
+    DATA_DIR / "vegetation_before.png",
+    FIRE_NAME
 )
 
 GRID_HEIGHT = GRID.shape[0]

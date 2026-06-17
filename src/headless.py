@@ -13,13 +13,15 @@ from simulation_params import (
     WIND_SCHEDULE,
     RAIN_SCHEDULE,
     RAIN_MULTIPLIER,
-    EXTINGUISH_PROB
+    EXTINGUISH_PROB,
+    FIRE_NAME
 )
 
-OUTPUT_IMAGE_PATH = "yacutz_headless_result.png"
+OUTPUT_IMAGE_PATH = "yacutz_headless_optimal_result.png"
 
 GRID = vegetation_map_to_grid(
-    DATA_DIR / "vegetation_river_before.png"
+    DATA_DIR / "vegetation_river_before.png",
+    FIRE_NAME
 )
 
 GRID_HEIGHT = GRID.shape[0]
